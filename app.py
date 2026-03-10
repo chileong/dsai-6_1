@@ -9,9 +9,9 @@ from groq import Groq
 import sqlite3
 import datetime
 
-#from dotenv import load_dotenv
-#if os.path.exists('.env'):
-#    load_dotenv()
+from dotenv import load_dotenv
+if os.path.exists('.env'):
+    load_dotenv()
 
 # for AWS, do not run this because not using .env
 #os.environ["GROQ_API_KEY"] = ""
@@ -52,6 +52,19 @@ def dbs_prediction():
 @app.route("/chatbot",methods=["GET","POST"])
 def chatbot():
     return(render_template("chatbot.html"))
+
+@app.route("/text_inference",methods=["GET","POST"])
+def text_inference():
+    return(render_template("text_inference.html"))
+
+@app.route("/text_result",methods=["GET","POST"])
+def text_result():
+    q = request.form.get("q")
+    text_model = joblib.load("model.pkl")
+    vectorizer = joblib.load("vectorizer.pkl")
+    X_emd = vectorizer.transform([q])
+    r = text_model.predict(X_emd)
+    return(render_template("text_result.html",r=r[0]))
 
 @app.route("/llama",methods=["GET","POST"])
 def llama():
